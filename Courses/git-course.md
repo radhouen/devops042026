@@ -297,7 +297,9 @@ Temporarily save uncommitted work.
 ```bash
 git stash
 ```
-
+Note: git stash working only with tracked files (Staged Area)
+so before ```bash git stash ``` 
+you should run ```bash git add . ```
 ## Save with Message
 
 ```bash
@@ -309,11 +311,40 @@ git stash push -m "WIP login page"
 ```bash
 git stash list
 ```
+Result example:
+
+```bash
+stash@{0}: WIP on dev: ec0138f Merge pull request #2 from radhouen/main
+stash@{1}: WIP on dev: ec0138f Merge pull request #2 from radhouen/main
+```
+
+### Display Stashed files:
+
+```bash
+git stash show stash@{stash_id} --name-only
+```
+Example
+```bash
+git stash show stash@{1} --name only 
+
+#---Result -----
+Courses/git-history.md
+application/backend/README.md
+application/cache/README.md
+application/database/README.md
+application/frontend/README.md
+
+```
 
 ## Apply Last Stash
 
 ```bash
 git stash apply
+```
+### Apply specific Stash:
+
+```bash
+git stash apply stash@{1}
 ```
 
 ## Apply and Remove
@@ -327,7 +358,9 @@ git stash pop
 ```bash
 git stash drop
 ```
+Note :
 
+git stash pop = git stash apply + git stash drop
 ## Clear All
 
 ```bash
