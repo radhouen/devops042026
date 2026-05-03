@@ -368,6 +368,26 @@ git stash clear
 ```
 
 ---
+### GIT tag:
+
+#### Create Tag:
+
+```bash
+git tag -a v1.0.0 -m "initial release"
+```
+
+#### List Tags:
+
+```bash
+git tag
+```
+
+#### Push tag:
+
+```bahs
+git push origin v1.0.0
+```
+---
 
 # 8. Real DevOps Workflow Example
 
