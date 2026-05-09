@@ -1,0 +1,39 @@
+# javascript app ---- node 
+# python app ---- python
+# java app   ---- from maven
+# static web app ---- nginx 
+FROM node:26
+WORKDIR /your-path-inside-the-container
+
+LABEL Maintainer="Mouna Hamdi"
+LABEL Project="sec"
+
+ENV DATABASE_HOST="dummy"
+ENV DATABASE_PORT="dummy"
+ENV DATABASE_NAME="dummy"
+ENV DATABASE_USER="dummy" \
+    DATABASE_PASSWORD="dummy"
+
+ARG PORT=3000
+
+
+ 
+# WORKDIR /app 
+# mkdir /app + cd /app
+COPY . /app
+# COPY . .
+# COPY ../userAPI/  .
+COPY package.json package.json
+ADD package-lock.json package-lock.json
+
+RUN npm install
+
+EXPOSE 3000
+
+USER 1000
+
+VOLUME ["/data"]
+
+CMD ["node","server.js"]
+
+ENTRYPOINT ["node"]
