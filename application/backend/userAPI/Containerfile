@@ -1,5 +1,5 @@
 # Use the latest Node.js LTS image
-FROM node:lts-alpine AS BUILD
+FROM node:lts-alpine
 
 # Create app directory
 WORKDIR /app
