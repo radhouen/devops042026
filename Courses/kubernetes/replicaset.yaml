@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  namespace: demo
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: webapp
+  template:
+    metadata:
+      labels:
+        tier: webapp
+    spec:
+      containers:
+      - name: webapp-container
+        image: nginx:1.14.2
