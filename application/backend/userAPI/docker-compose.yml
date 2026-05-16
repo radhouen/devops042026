@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  app:
+    # build image locally after that used it : dockerfile path = . (current path) 
+    build: .
+    container_name: user-management-app
+    restart: unless-stopped
+    ports:
+    # - "host-port":"service-port"
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # name resolution using the service name in the DB_HOST
+      DB_HOST: postgres
+      DB_PORT: 5434
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+      DB_NAME: appdb
+    # depends_on : postgres service must be running before the app service
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres-db1
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: appdb
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-user-management-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+  postgres-user-management-data:
+
+networks:
+  app-network:
