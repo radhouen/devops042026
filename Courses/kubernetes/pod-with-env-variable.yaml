@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envar-demo
+  namespace: test
+  labels:
+    purpose: demonstrate-envars
+spec:
+  containers:
+  - name: envar-demo-container
+    image: nginx
+    env:
+    - name: DEMO_GREETING
+      value: "Hello from the environment"
+    - name: DEMO_FAREWELL
+      value: "Such a sweet sorrow"
+    - name: USERNAME # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: username
+    - name: LOCATION # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: location
+    - name: PHONENUMBER # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: phone

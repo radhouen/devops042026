@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  location: "bizerte"
+  username: "walid"
+  phone: "97671263"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2026-05-18T18:36:43Z"
+  name: web-config
+  namespace: test
