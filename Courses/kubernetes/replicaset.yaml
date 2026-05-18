@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
   name: frontend
-  namespace: demo
+  namespace: test
   labels:
     app: guestbook
     tier: frontend
