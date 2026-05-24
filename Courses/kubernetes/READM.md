@@ -302,3 +302,64 @@ KUBERNETES_PORT_443_TCP=tcp://10.2.0.1:443
 KUBERNETES_PORT_443_TCP_PROTO=tcp
 HOME=/root
 ```
+
+
+---
+### Kubernetes Networking:
+
+### Services:
+
+1- Create service:
+
+1.1- Imperative:
+
+```bash
+kubectl expose po/web-app --port=8090 --target-port=80 -n test
+```
+1.2- Declarative:
+```yaml
+# kubectl get svc webapp-pod -n test -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-pod
+  namespace: test
+  labels:
+    color: green # pod label 
+spec:
+  containers:
+  - name: webapp-container
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80 # must be defined to be used in the target-port in the service
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-05-19T19:05:13Z"
+  labels:
+    color: green
+  name: webapp-pod
+  namespace: test
+  resourceVersion: "105148991"
+  uid: 63204ab9-ac08-47f8-9f83-6176c918e953
+spec:
+  clusterIP: 10.2.240.70
+  clusterIPs:
+  - 10.2.240.70
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8090 # port where the service listen 
+    protocol: TCP
+    targetPort: 80 # must equal to containerPort in the pod code in the line 334
+  selector:
+    color: green # must match the pod label in the line 328
+  sessionAffinity: None
+  type: ClusterIP # First and default service type
+status:
+  loadBalancer: {}
+```
