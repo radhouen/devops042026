@@ -74,3 +74,292 @@ How to create a pod:
  5805  kubectl port-forward --help
  5807  kubectl port-forward -n demo po/webapp-pod --address 0.0.0.0 8090:80
 ```
+
+
+
+### configMap:
+
+#### Impertative command
+```bash
+Examples:
+  # Create a new config map named my-config based on folder bar
+  kubectl create configmap my-config --from-file=path/to/bar
+  
+  # Create a new config map named my-config with specified keys instead of file basenames on disk
+  kubectl create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt
+  
+  # Create a new config map named my-config with key1=config1 and key2=config2
+  kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
+  
+  # Create a new config map named my-config with key=value pairs from an env file
+  kubectl create configmap my-config --from-env-file=path/to/bar.env
+```
+
+Example
+
+```bash
+kubectl create configmap web-config --from-literal=username=walid --from-literal=loacation=bizerte -n test
+```
+
+#### Declarative from YAML:
+
+```yaml
+apiVersion: v1
+data:
+  location: "bizerte"
+  username: "walid"
+  phone: "97671263"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2026-05-18T18:36:43Z"
+  name: web-config
+  namespace: test
+```
+
+Use Create configMap in the POD level:
+
+1- Method 1(ConfigMapKeyRef):
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: envar-demo
+  namespace: test
+  labels:
+    purpose: demonstrate-envars
+spec:
+  containers:
+  - name: envar-demo-container
+    image: nginx
+    env:
+    - name: DEMO_GREETING
+      value: "Hello from the environment"
+    - name: DEMO_FAREWELL
+      value: "Such a sweet sorrow"
+    - name: USERNAME # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: username
+    - name: LOCATION # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: location
+    - name: PHONENUMBER # Notice that the case is different here
+      valueFrom:
+        configMapKeyRef:
+          name: web-config           # The ConfigMap this value comes from.
+          key: phone
+
+```
+
+2- Method 2(ConfigMapRef): 
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: env-configmap
+  namespace: test
+spec:
+  containers:
+    - name: app
+      command: ["/bin/sh", "-c", "printenv"]
+      image: busybox:latest
+      envFrom:
+        - configMapRef:
+            name: web-config
+```
+
+
+
+### Secret:
+
+1- Imperative:
+
+```bash
+kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret -n test
+```
+
+get secret:
+
+```yaml
+# kubectl get secret my-secret -n test -o yaml 
+apiVersion: v1
+data:
+  key1: c3VwZXJzZWNyZXQ=
+  key2: dG9wc2VjcmV0
+kind: Secret
+metadata:
+  creationTimestamp: "2026-05-18T19:09:11Z"
+  name: my-secret
+  namespace: test
+  resourceVersion: "104736973"
+  uid: e52f5d47-8557-4a84-906d-fb45d908925b
+type: Opaque
+```
+
+```bash
+kubectl create secret docker-registry cxgsuiteqafrctlacr \
+  --docker-server=cxgsuiteqafrctlacr.azurecr.io \
+  --docker-username=radhouen \
+  --docker-password=<supersecret\
+  --docker-email=askriradhouen@gmail.com -n test
+
+```
+
+result:
+
+```
+kubectl get secret -n test
+NAME                 TYPE                             DATA   AGE
+cxgsuiteqafrctlacr   kubernetes.io/dockerconfigjson   1      8s
+my-secret            Opaque                           2      12m
+```
+
+
+```yaml
+# kubectl get secret cxgsuiteqafrctlacr -n test -o yaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJjeGdzdWl0ZXFhZnJjdGxhY3IuYXp1cmVjci5pbyI6eyJ1c2VybmFtZSI6InJhZGhvdWVuIiwicGFzc3dvcmQiOiJzdXBlcnNlY3JldCIsImVtYWlsIjoiYXNrcmlyYWRob3VlbkBnbWFpbC5jb20iLCJhdXRoIjoiY21Ga2FHOTFaVzQ2YzNWd1pYSnpaV055WlhRPSJ9fX0=
+kind: Secret
+metadata:
+  creationTimestamp: "2026-05-18T19:21:26Z"
+  name: cxgsuiteqafrctlacr
+  namespace: test
+  resourceVersion: "104740481"
+  uid: 520c595b-160f-4aeb-ae3f-4e58a2ae8b6f
+type: kubernetes.io/dockerconfigjson
+```
+
+### TLS type:
+
+```bash
+kubectl create secret tls <SECRET_NAME> \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key
+```
+
+How to use secret:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-use-secret
+  namespace: test
+  labels:
+    purpose: demonstrate-envars
+spec:
+  containers:
+  - name: pod-use-secret-container
+    image: nginx
+    env:
+    - name: PASSWORDONE # Notice that the case is different here
+      valueFrom:
+        secretKeyRef:
+          name: my-secret           # The ConfigMap this value comes from.
+          key: key1
+    - name: PASSWORDTWO # Notice that the case is different here
+      valueFrom:
+        secretKeyRef:
+          name: my-secret           # The ConfigMap this value comes from.
+          key: key2
+```
+
+Testing:
+
+```bash
+kubectl apply -f pod-with-env-variable-secretkeyref.yaml -n test
+pod/pod-use-secret created
+# ---
+kubectl get po -n test
+NAME             READY   STATUS             RESTARTS       AGE
+env-configmap    0/1     CrashLoopBackOff   12 (17s ago)   36m
+envar-demo       1/1     Running            0              42m
+pod-use-secret   1/1     Running            0              6s
+# --------
+kubectl exec -n test pod-use-secret   -- printenv
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=pod-use-secret
+NGINX_VERSION=1.31.0
+NJS_VERSION=0.9.8
+NJS_RELEASE=1~trixie
+ACME_VERSION=0.4.1
+PKG_RELEASE=1~trixie
+DYNPKG_RELEASE=1~trixie
+PASSWORDONE=supersecret  #------- value from secret
+PASSWORDTWO=topsecret    #******* value from secret
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_ADDR=10.2.0.1
+KUBERNETES_SERVICE_HOST=10.2.0.1
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_PORT=tcp://10.2.0.1:443
+KUBERNETES_PORT_443_TCP=tcp://10.2.0.1:443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+HOME=/root
+```
+
+
+---
+### Kubernetes Networking:
+
+### Services:
+
+1- Create service:
+
+1.1- Imperative:
+
+```bash
+kubectl expose po/web-app --port=8090 --target-port=80 -n test
+```
+1.2- Declarative:
+```yaml
+# kubectl get svc webapp-pod -n test -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp-pod
+  namespace: test
+  labels:
+    color: green # pod label 
+spec:
+  containers:
+  - name: webapp-container
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80 # must be defined to be used in the target-port in the service
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-05-19T19:05:13Z"
+  labels:
+    color: green
+  name: webapp-pod
+  namespace: test
+  resourceVersion: "105148991"
+  uid: 63204ab9-ac08-47f8-9f83-6176c918e953
+spec:
+  clusterIP: 10.2.240.70
+  clusterIPs:
+  - 10.2.240.70
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8090 # port where the service listen 
+    protocol: TCP
+    targetPort: 80 # must equal to containerPort in the pod code in the line 334
+  selector:
+    color: green # must match the pod label in the line 328
+  sessionAffinity: None
+  type: ClusterIP # First and default service type
+status:
+  loadBalancer: {}
+```
