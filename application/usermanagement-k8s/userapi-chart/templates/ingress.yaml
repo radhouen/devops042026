@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: usermanagement.rns.tn # 👈 Corrigé avec le "e"
+    http:
+      paths:
+      - path: /(.*) # 👈 Capture tout ce qui va vers le frontend
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-frontend-service
+            port:
+              number: 80
+      - path: /api/(.*) # 👈 Redirige les appels API vers ton backend automatiquement !
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-backend-service
+            port:
+              number: 80 # Mets le port de ton service backend s'il est différent (ex: 5000 ou 8080)
