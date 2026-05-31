@@ -35,11 +35,16 @@ pipeline {
 
         
 
-        stage('Archive Artifacts') {
+        /* stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: '*/dist/*', fingerprint: true
             }
-        }
+        } */
+        stage('Archive Artifacts') {
+    steps {
+        archiveArtifacts artifacts: 'application/store-management-frontend/dist/**/*', fingerprint: true
+    }
+}
     }
 
     post {
