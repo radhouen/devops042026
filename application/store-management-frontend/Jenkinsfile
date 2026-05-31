@@ -33,11 +33,7 @@ pipeline {
             }
         } */
 
-        stage('Build Angular App') {
-            steps {
-                bat 'npm run build'
-            }
-        }
+        
 
         stage('Archive Artifacts') {
             steps {
