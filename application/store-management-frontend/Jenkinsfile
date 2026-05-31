@@ -27,24 +27,11 @@ pipeline {
             }
         }
 
-       /*  stage('Run Tests') {
-            steps {
-                sh 'npm run test -- --watch=false --browsers=ChromeHeadless'
-            }
-        } */
-
-        
-
-        /* stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: '*/dist/*', fingerprint: true
-            }
-        } */
         stage('Archive Artifacts') {
-    steps {
-        archiveArtifacts artifacts: 'application/store-management-frontend/dist/**/*', fingerprint: true
+            steps {
+                archiveArtifacts artifacts: 'application/store-management-frontend/dist/**/*', fingerprint: true
+         }
     }
-}
     }
 
     post {
