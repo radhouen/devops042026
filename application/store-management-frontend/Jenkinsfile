@@ -19,7 +19,11 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                dir('application/store-management-frontend') {
+                    sh 'npm install'
+                  
+                }
+                
             }
         }
 
