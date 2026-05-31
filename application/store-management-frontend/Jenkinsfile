@@ -19,7 +19,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('application/store-managementt-frontend') {
+                dir('application/store-management-frontend') {
                     bat 'npm install'
                     bat 'npm run build'
                 }
