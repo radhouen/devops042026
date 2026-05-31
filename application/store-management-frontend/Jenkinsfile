@@ -19,8 +19,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                    sh 'ls'
-                    sh 'npm install'
+                  bat 'npm install'
                   
                 
             }
@@ -34,7 +33,7 @@ pipeline {
 
         stage('Build Angular App') {
             steps {
-                sh 'npm run build'
+                bat 'npm run build'
             }
         }
 
