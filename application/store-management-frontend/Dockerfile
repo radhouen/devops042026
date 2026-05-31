@@ -25,7 +25,7 @@ FROM nginx:alpine
 # Copy the custom nginx configuration file from your project root to the container
 COPY nginx.conf /etc/nginx/nginx.conf
 # Copy the build artifacts from the 'build' stage to the Nginx serving directory
-COPY --from=build /app/dist/store-management-frontend/browser/ /usr/share/nginx/html/
+COPY --from=build /app/dist/store-management-frontend/ /usr/share/nginx/html/
 
 # Expose port 80 and start Nginx
 EXPOSE 80
