@@ -21,8 +21,13 @@ pipeline {
              dir('application/store-management-frontend') {
 
             script {
-                def customImage = docker.build("wahibaz/jenkinstest:${env.BUILD_ID}")
-
+                echo "Building Docker image..."
+                def customImage = docker.build("wahibaz/jenkinstest:${env.BUILD_ID}",".")
+                
+                echo "Display Docker images..."
+                bat 'docker images'
+                
+                echo "Pushing Docker image..."
                 docker.withRegistry('https://index.docker.io/v1/', 'dockerhubcredentials') {
                     customImage.push()
                     customImage.push('latest')
