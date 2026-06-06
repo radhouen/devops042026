@@ -1,0 +1,19 @@
+# values.yaml
+
+# 1. Base de données PostgreSQL
+postgres:
+  user: "postgres"
+  password: "admin"
+  db: "postgres"
+  storage: "2Gi"
+
+# 2. Ton Backend API (celui que tu avais déjà, mais centralisé ici)
+backend:
+  image: "wahibaz/userapi"
+  tag: "v1.0.0"
+
+# 3. Ton tout nouveau Frontend React
+frontend:
+  image: "wahibaz/userfront"
+  tag: "v1.0.0"
+  nodePort: 30080

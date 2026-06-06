@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs "node26"
+    }
+
+    environment {
+        CI = 'true'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm /* git pull pour le projet into jenkins */
+            }
+        }
+        stage('Build docker image') {
+            steps {
+             dir('application/store-management-frontend') {
+
+            script {
+                withEnv(['DOCKER_BUILDKIT=0']) {
+                    echo "Building Docker image..."
+                    def customImage = docker.build("wahibaz/jenkinstest:${env.BUILD_ID}",".")
+                    
+                    echo "Display Docker images..."
+                    bat 'docker images'
+                    
+                    echo "Pushing Docker image..."
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhubcredentials') {
+                        customImage.push()
+                        customImage.push('latest')
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+        stage('Install Dependencies') {
+            steps {
+                /* we use dir(path) because the Jenkinsfile is not in root path(devops042026)  */
+                /* we use bat because we are in windows agent */
+                dir('application/store-management-frontend') {
+                    bat 'npm install'
+                    bat 'npm run build'
+                }
+                
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+              /*  The Pipeline Snippet Generator generates this example when all arguments are set to true (some arguments by default are true):
+                    archiveArtifacts artifacts: 'path to artifact',
+                   allowEmptyArchive: true,
+                   fingerprint: true,
+                   onlyIfSuccessful: true */
+
+                archiveArtifacts artifacts: 'application/store-management-frontend/dist/**/*', fingerprint: true
+         }
+    }
+
+   
+    }
+
+    post {
+
+        success {
+            echo 'Angular application built successfully!'
+        }
+
+        failure {
+            echo 'Build failed!'
+        }
+
+        always {
+            cleanWs()
+        }
+    }
+}
